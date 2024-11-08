@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserRequestDto } from './dto/create-user.request-dto';
+import { CreateUserRequestDto, createUserRequestSchema } from './dto/create-user.request-dto';
 import { UpdateUserRequestDto } from './dto/update-user.request-dto';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { UserEntity } from './user.entity';
@@ -32,7 +32,7 @@ export class UserController {
   }
 
   @Post()
-  @UsePipes(ZodValidationPipe)
+  @UsePipes(new ZodValidationPipe(createUserRequestSchema))
   async createUser(@Body() createUserDto: CreateUserRequestDto) {
     return this.userService.createUser(createUserDto);
   }

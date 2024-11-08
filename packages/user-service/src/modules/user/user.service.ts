@@ -1,16 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserEntity } from './user.entity';
 import { PaginateRequest } from './paginate';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-  ) {}
+    @Inject('NOTIFICATION_SERVICE')
+    private readonly notificationService: ClientProxy,
+  ) {
+    this.notificationService.connect().then(() => {
+      console.log('Notification service connected');
+    }).catch((err) => {
+      console.error('Notification service connection error', err);
+    });
+  }
 
   async getUsers(paginate: PaginateRequest) {
-    const pagePromise =  this.userRepository.getListPage(paginate);
+    const pagePromise = this.userRepository.getListPage(paginate);
     const countPromise = this.userRepository.getListCount();
 
     const [page, count] = await Promise.all([pagePromise, countPromise]);
@@ -32,7 +41,13 @@ export class UserService {
   }
 
   async createUser(data: UserEntity) {
-    return this.userRepository.createUser(data);
+    const createUser = await this.userRepository.createUser(data);
+
+    await this.notificationService.emit('notification_send', createUser.id).toPromise().catch((err) => {
+      console.error('Notification send error', err);
+    });
+
+    return createUser;
   }
 
   async updateUser(id: string, data: Partial<UserEntity>) {
