@@ -8,11 +8,11 @@ export class NotificationService {
     @Inject(RMQ_NOTIFICATION_SERVICE_TOKEN)
     private readonly notificationService: ClientProxy,
   ) {
-    this.notificationService.connect().then(() => {
-      console.log('Notification service connected');
-    }).catch((err) => {
-      console.error('Notification service connection error', err);
-    });
+    // this.notificationService.connect().then(() => {
+    //   console.log('Notification service connected');
+    // }).catch((err) => {
+    //   console.error('Notification service connection error', err);
+    // });
   }
 
   async sendUserCreatedNotification(userId: string): Promise<void> {

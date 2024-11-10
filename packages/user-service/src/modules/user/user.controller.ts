@@ -1,12 +1,17 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserRequestDto, createUserRequestSchema } from './dto/create-user.request-dto';
+import { CreateUserRequestDto } from './dto/create-user.request-dto';
 import { UpdateUserRequestDto } from './dto/update-user.request-dto';
-import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { UserEntity } from './user.entity';
-import { PaginateResponse } from './paginate';
+import { ApiTags } from '@nestjs/swagger';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { UserResponseDto } from './dto/user.response-dto';
+import { PaginateResponse } from '../../shared/common/paginate';
+import { ObjectIdValidationPipe } from '../../shared/common/object-id-validation.pipe';
 
-@Controller('user')
+@UsePipes(ZodValidationPipe)
+@Controller('users')
+@ApiTags('user')
 export class UserController {
 
   private readonly DEFAULT_PER_PAGE = 25;
@@ -26,26 +31,23 @@ export class UserController {
     });
   }
 
-  @Get('{id}')
-  async getUser(@Param('id') id: string) {
+  @Get('/:id')
+  async getUser(@Param('id', ObjectIdValidationPipe) id: string): Promise<UserResponseDto | null> {
     return this.userService.getUserById(id);
   }
 
   @Post()
-  @UsePipes(new ZodValidationPipe(createUserRequestSchema))
-  async createUser(@Body() createUserDto: CreateUserRequestDto) {
+  async createUser(@Body() createUserDto: CreateUserRequestDto): Promise<UserResponseDto> {
     return this.userService.createUser(createUserDto);
   }
 
-  @Put('{id}')
-  @UsePipes(ZodValidationPipe)
-  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserRequestDto) {
+  @Put(':id')
+  async updateUser(@Param('id', ObjectIdValidationPipe) id: string, @Body() updateUserDto: UpdateUserRequestDto): Promise<UserResponseDto> {
     return this.userService.updateUser(id, updateUserDto);
   }
 
-  @Delete('{id}')
-  @UsePipes()
-  async deleteUser(@Param('id') id: string) {
+  @Delete(':id')
+  async deleteUser(@Param('id', ObjectIdValidationPipe) id: string): Promise<void> {
     return this.userService.deleteUser(id);
   }
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserEntity } from './user.entity';
-import { PaginateRequest } from './paginate';
 import { Prisma } from '@prisma/client';
 import { UserAlreadyExistsError } from './errors/user-already-exists.error';
 import { NotificationService } from '../notification/notification.service';
+import { UserNotFoundError } from './errors/user-not-found.error';
+import { PaginateRequest } from '../../shared/common/paginate';
 
 @Injectable()
 export class UserService {
@@ -33,7 +34,13 @@ export class UserService {
   }
 
   async getUserById(id: string) {
-    return this.userRepository.getUserById(id);
+    const user = await this.userRepository.getUserById(id);
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    return user;
   }
 
   async createUser(data: UserEntity) {

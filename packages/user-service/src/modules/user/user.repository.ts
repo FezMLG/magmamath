@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '@prisma/client';
-import { PaginateRequest } from './paginate';
+import { PaginateRequest } from '../../shared/common/paginate';
 
 @Injectable()
 export class UserRepository {
