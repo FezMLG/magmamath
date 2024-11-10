@@ -1,23 +1,30 @@
 name: magma-microservices
 
 services:
-  # mongodb
-  #  mongo1:
-  #    image: mongo:8.0
-  #    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
-  #    ports:
-  #      - 27017:27017
-  #    extra_hosts:
-  #      - "host.docker.internal:host-gateway"
-  #    healthcheck:
-  #      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
-  #      interval: 5s
-  #      timeout: 30s
-  #      start_period: 0s
-  #      retries: 30
-  #    volumes:
-  #      - "mongo1_data:/data/db"
-  #      - "mongo1_config:/data/configdb"
+#  user-service:
+#    build:
+#      dockerfile: user-service.Dockerfile
+#      context: ./
+#    depends_on:
+#      rabbitmq:
+#        condition: service_healthy
+#    environment:
+#      NODE_ENV: production
+#      DATABASE_URL: "mongodb+srv://konradchw:6EVsAj688EnZ474c@cluster0.iy0oj.mongodb.net/magmamath?retryWrites=true&w=majority&appName=Cluster0"
+#      RABBITMQ_URL: "amqp://localhost:5672"
+#      NOTIFICATION_QUEUE_NAME: "notification_send"
+#    ports:
+#      - "3333:3333"
+
+#  notification-service:
+#    build:
+#      context: ./packages/notification-service
+#    depends_on:
+#      rabbitmq:
+#        condition: service_healthy
+#    environment:
+#      NODE_ENV: production
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -34,6 +41,4 @@ networks:
     driver: bridge
 
 volumes:
-  #  mongo1_data:
-  #  mongo1_config:
   rabbitmq_data:
