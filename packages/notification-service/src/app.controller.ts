@@ -6,8 +6,13 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @MessagePattern('notification_send')
+  @MessagePattern('notification_send_welcome')
   getHello(@Payload() data: string[]): void {
-    console.log(data);
+    console.log("Welcome", data);
+  }
+
+  @MessagePattern('notification_send_delete')
+  getDelete(@Payload() data: string[]): void {
+    console.log("Deleting", data);
   }
 }

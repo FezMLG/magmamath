@@ -47,7 +47,7 @@ export class UserService {
     try {
       const createUser = await this.userRepository.createUser(data);
 
-      await this.notificationService.sendUserCreatedNotification(createUser.id);
+      await this.notificationService.sendUserCreatedNotification(createUser.email);
 
       return createUser;
     } catch (e) {
@@ -63,8 +63,10 @@ export class UserService {
   }
 
   async deleteUser(id: string) {
+    const user = await this.getUserById(id);
+
     await this.userRepository.deleteUser(id);
 
-    await this.notificationService.sendUserDeletedNotification(id);
+    await this.notificationService.sendUserDeletedNotification(user.email);
   }
 }

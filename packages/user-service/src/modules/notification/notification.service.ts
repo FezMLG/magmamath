@@ -15,14 +15,14 @@ export class NotificationService {
     // });
   }
 
-  async sendUserCreatedNotification(userId: string): Promise<void> {
-    await this.notificationService.emit('notification_send', userId).toPromise().catch((err) => {
+  async sendUserCreatedNotification(email: string): Promise<void> {
+    await this.notificationService.emit('notification_send_welcome', email).toPromise().catch((err) => {
       console.error('Notification send error', err);
     });
   }
 
-  async sendUserDeletedNotification(userId: string): Promise<void> {
-    await this.notificationService.emit('notification_send', userId).toPromise().catch((err) => {
+  async sendUserDeletedNotification(email: string): Promise<void> {
+    await this.notificationService.emit('notification_send_delete', email).toPromise().catch((err) => {
       console.error('Notification send error', err);
     });
   }
