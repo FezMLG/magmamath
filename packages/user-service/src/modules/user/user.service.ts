@@ -1,21 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserEntity } from './user.entity';
 import { PaginateRequest } from './paginate';
-import { ClientProxy } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
+import { UserAlreadyExistsError } from './errors/user-already-exists.error';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    @Inject('NOTIFICATION_SERVICE')
-    private readonly notificationService: ClientProxy,
+    private readonly notificationService: NotificationService,
   ) {
-    this.notificationService.connect().then(() => {
-      console.log('Notification service connected');
-    }).catch((err) => {
-      console.error('Notification service connection error', err);
-    });
   }
 
   async getUsers(paginate: PaginateRequest) {
@@ -41,13 +37,18 @@ export class UserService {
   }
 
   async createUser(data: UserEntity) {
-    const createUser = await this.userRepository.createUser(data);
+    try {
+      const createUser = await this.userRepository.createUser(data);
 
-    await this.notificationService.emit('notification_send', createUser.id).toPromise().catch((err) => {
-      console.error('Notification send error', err);
-    });
+      await this.notificationService.sendUserCreatedNotification(createUser.id);
 
-    return createUser;
+      return createUser;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new UserAlreadyExistsError(data.email);
+      }
+      throw e;
+    }
   }
 
   async updateUser(id: string, data: Partial<UserEntity>) {
@@ -55,6 +56,8 @@ export class UserService {
   }
 
   async deleteUser(id: string) {
-    return this.userRepository.deleteUser(id);
+    await this.userRepository.deleteUser(id);
+
+    await this.notificationService.sendUserDeletedNotification(id);
   }
 }
