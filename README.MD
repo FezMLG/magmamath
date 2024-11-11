@@ -5,6 +5,7 @@ Microservices-based application with two services - User Service and Notificatio
 ## How to run:
 - Clone the repository.
 - Run `docker-compose up` in the root directory.
+- For database please use MongoDB Atlas.
 - Go to `packages/user-service`, fill out env file and run `npm run start`.
 - Go to `packages/notification-service` and run `npm run start`.
 
