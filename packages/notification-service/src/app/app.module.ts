@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from '../user/user.module';
-import { PrismaModule } from '../database/prisma.module';
+import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
-import { BaseConfig } from '../app-config/base-config.service';
 import { AppConfigModule } from '../app-config/app-config.module';
-import { HealthModule } from '../health/health.module';
 
 @Module({
   imports: [
@@ -18,14 +15,8 @@ import { HealthModule } from '../health/health.module';
       isGlobal: true,
     }),
     AppConfigModule,
-    PrismaModule.forRootAsync({
-      useFactory: (config: BaseConfig) => {
-        return { databaseUrl: config.databaseUrl };
-      },
-      inject: [BaseConfig],
-    }),
-    UserModule,
-    HealthModule,
   ],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {}

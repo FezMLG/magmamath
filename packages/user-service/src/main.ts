@@ -3,7 +3,6 @@ import { AppModule } from './modules/app/app.module';
 import { Swagger } from './modules/swagger/swagger-ui';
 import { RMQ_NOTIFICATION_SERVICE_TOKEN } from './modules/notification/rmq-notification-service.token';
 import { ClientProxy } from '@nestjs/microservices';
-import { patchNestJsSwagger } from 'nestjs-zod';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
